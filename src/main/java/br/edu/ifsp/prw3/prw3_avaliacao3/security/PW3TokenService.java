@@ -10,6 +10,10 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 @Service
 public class PW3TokenService {
 
@@ -30,4 +34,17 @@ public class PW3TokenService {
     private Instant dataExpiracao() {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
+
+    public String getSubject(String tokenJWT) {
+        try {
+            var algoritmo = Algorithm.HMAC256("12345678");
+            JWTVerifier jwtv = JWT.require(algoritmo)
+                    .withIssuer("PRW3_AVALIACAO")
+                    .build();
+            return jwtv.verify(tokenJWT).getSubject();
+        } catch (JWTVerificationException exception) {
+            throw new RuntimeException("Token JWT inválido ou expirado!");
+        }
+    }
+
 }
